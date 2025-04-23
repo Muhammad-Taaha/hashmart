@@ -73,6 +73,22 @@ def delete(request, post_id):
         return redirect("one:all_list")
     return render(request, "delete.html", {'post': post})
 
+# def register(request):
+#     if request.method == "POST":
+#         form = User_registration(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.set_password(form.cleaned_data['password1'])
+#             user.save()
+#             login(request, user)
+#             return redirect("one:all_list")
+#     else:
+#         form = User_registration()
+#     return render(request, "registration/register.html", {'form': form})
+
+
+from django.contrib.auth import login
+
 def register(request):
     if request.method == "POST":
         form = User_registration(request.POST)
@@ -80,11 +96,16 @@ def register(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password1'])
             user.save()
+
+            # 👇 Fix: Set backend before login
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+
             return redirect("one:all_list")
     else:
         form = User_registration()
     return render(request, "registration/register.html", {'form': form})
+
 
 
 
