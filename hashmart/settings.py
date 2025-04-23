@@ -155,7 +155,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.yourcustomdomain.com',
 ]
 
-]
+
 CSRF_COOKIE_SECURE = False
 
 # Social accounts configuration
