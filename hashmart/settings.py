@@ -151,8 +151,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',  # For local dev environment
     'http://127.0.0.1:8000',
     'https://sandbox.jazzcash.com.pk',
-    'https://hashmart-6.onrender.com',
     'https://hashmart-7.onrender.com',
+    'https://hashmart-8.onrender.com',
     
 ]
 
