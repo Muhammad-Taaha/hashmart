@@ -151,6 +151,10 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',  # For local dev environment
     'http://127.0.0.1:8000',
     'https://sandbox.jazzcash.com.pk',
+    'https://your-app-name.onrender.com',
+    'https://www.yourcustomdomain.com',
+]
+
 ]
 CSRF_COOKIE_SECURE = False
 
