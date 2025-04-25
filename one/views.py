@@ -109,43 +109,90 @@ def register(request):
 
 
 
-hf_token = "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"
-repo_id = "mistralai/Mistral-7B-Instruct-v0.3"
-client = InferenceClient(model=repo_id, token=hf_token)
+# hf_token = "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"
+# repo_id = "mistralai/Mistral-7B-Instruct-v0.3"
+# client = InferenceClient(model=repo_id, token=hf_token)
 
 
+
+# def chat_view(request):
+#     user_message = ''
+#     bot_response = ''
+
+#     if request.method == 'POST':
+#         user_message = request.POST.get('message', '').strip()
+
+#         if user_message:
+#             # Send the message to the Hugging Face API
+#             headers = {
+#                 "Authorization": f"Bearer {hf_token}"
+#             }
+#             data = {
+#                 "inputs": user_message
+#             }
+
+#             url = f"https://api-inference.huggingface.co/models/{repo_id}"
+
+#             response = requests.post(url, headers=headers, json=data)
+
+#             if response.status_code == 200:
+#                 bot_response = response.json()[0]['generated_text']
+#             else:
+#                 bot_response = f"Error: {response.status_code}, {response.text}"
+#         else:
+#             bot_response = "Please say something!"
+
+#     return render(request, 'chat.html', {
+#         'user_message': user_message,
+#         'bot_response': bot_response
+#     })
+
+
+
+from django.shortcuts import render
+from django.http import HttpResponse
+import google.generativeai as genai
+
+# Set up the Gemini API client
+genai.configure(api_key="AIzaSyB_VJhV-54vZT-lRFrPtuMdiyGgXSZkmcM")
+model = genai.GenerativeModel(model_name="gemini-2.0-flash")
 
 def chat_view(request):
+    # Initialize message variables
     user_message = ''
     bot_response = ''
+    
+    # Check if there is a previous conversation stored in the session
+    if 'conversation' not in request.session:
+        request.session['conversation'] = []
 
+    # If the form is submitted
     if request.method == 'POST':
         user_message = request.POST.get('message', '').strip()
 
         if user_message:
-            # Send the message to the Hugging Face API
-            headers = {
-                "Authorization": f"Bearer {hf_token}"
-            }
-            data = {
-                "inputs": user_message
-            }
+            try:
+                # Generate bot response using Gemini model
+                response = model.generate_content(user_message)
+                bot_response = response.text  # Get the response text from Gemini
 
-            url = f"https://api-inference.huggingface.co/models/{repo_id}"
+                # Store the conversation in the session
+                request.session['conversation'].append({'user_message': user_message, 'bot_response': bot_response})
+                request.session.modified = True  # Ensure session is updated
 
-            response = requests.post(url, headers=headers, json=data)
-
-            if response.status_code == 200:
-                bot_response = response.json()[0]['generated_text']
-            else:
-                bot_response = f"Error: {response.status_code}, {response.text}"
+            except Exception as e:
+                bot_response = f"Error: {str(e)}"
         else:
             bot_response = "Please say something!"
 
+    # Render the template with the conversation history
     return render(request, 'chat.html', {
+        'conversation': request.session['conversation'],
         'user_message': user_message,
         'bot_response': bot_response
     })
+
+
 
 
 def empty_chat_view(request):
